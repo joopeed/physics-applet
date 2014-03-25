@@ -12,26 +12,20 @@ import sys, pygame, random, os, urllib
 from time import *
 pygame.init()
  
-
-
-
-
-
-
 size = wid, hei = 990, 590 # size obviously ## pensei em aumentar o tamanho!!
 back = 132, 122, 130 # background color RGB
 screen = pygame.display 
-screen.set_caption("Txu ru ru")
+screen.set_caption("Appret de Fisica")
 screen = pygame.display.set_mode(size)
 pygame.display.set_mode(size)
 pygame.key.set_repeat(140,80)
 
 from sys import stdout
 from pygame.locals import *
-import pygame.scrap as scrap  
-import popen2
-scrap.init()
-scrap.set_mode(SCRAP_CLIPBOARD)
+#import pygame.scrap as scrap  
+#import popen2
+#scrap.init()
+#scrap.set_mode(SCRAP_CLIPBOARD)
 # Buffer musics
 #pygame.mixer.music.load("musics/quebranozes.mp3") tem de ser uma musiquinha de tensão
 
@@ -47,10 +41,10 @@ font_small = pygame.font.Font(None, 15)
 
 # Buffer image
 images = {}
-images["pharight"] = pygame.image.load("monstrinhoright.png").convert_alpha()
-images["phaleft"] = pygame.image.load("monstrinholeft.png").convert_alpha()
-images["phadown"] = pygame.image.load("monstrinhodown.png").convert_alpha()
-images["phaup"] = pygame.image.load("monstrinhoup.png").convert_alpha()
+#images["pharight"] = pygame.image.load("monstrinhoright.png").convert_alpha()
+#images["phaleft"] = pygame.image.load("monstrinholeft.png").convert_alpha()
+#images["phadown"] = pygame.image.load("monstrinhodown.png").convert_alpha()
+#images["phaup"] = pygame.image.load("monstrinhoup.png").convert_alpha()
 # End of buffer image
 
 
@@ -358,101 +352,45 @@ class Form(pygame.Rect,object):
 
 
 
+class Reta:
+        def __init__(self, position_initial, length, color):
+                self.x, self.y = position_initial
+                self.color = color
+                self.length = length
+
+        def draw(self, screen):
+                print self.x, self.y, self.length
+                pygame.draw.line(screen, self.color, (self.x, self.y), (self.x + self.length, self.y), 3)
+
+        def move_right(self):
+                self.x += 1
+        def move_left(self):
+                self.x -= 1
+                        
 
 
 
 
-
-
-
-
-
-class Board:
-	"""
-	Class to set board
-	Gets Size of squares, How many squares horizontally and How many squares vertically
-	"""
-	def __init__(self, size_of_squares, x_many, y_many, radius):
-                self.squares = [[ pygame.Rect(5+(size_of_squares-1)*i+i,5+ (size_of_squares-1)*j+j, (size_of_squares-1), (size_of_squares-1)) for i in range(x_many)] for j in range(y_many)]
-		self.matrix = [[" "]*x_many for i in range(y_many)]
-		self.matrix[0][0] = "X" # Initial position
-		self.radius = radius
-		
-		
-	def draw(self, screen, x_position, y_position):
-		for i in range(len(self.squares)):
-	                  for j in range(len(self.squares[i])):
-	                           if i in range(x_position-self.radius,x_position+self.radius+1) and j in range(y_position-self.radius,y_position+self.radius+1):
-	                                    if (i,j) == (x_position,y_position):
-	                                    	pygame.draw.rect(screen, (205,10,10), self.squares[i][j], 0) # at point
-	                                    else:
-	                                    	pygame.draw.rect(screen, (205,205,205), self.squares[i][j], 0) # Color inside radius	
-	                           else:
-	                                    pygame.draw.rect(screen, (235,235,235), self.squares[i][j], 0) # Color outside radius
-	                                                   
-	                           
-		
-	
-	
-	
-class Person:
-	""" 
-	Class to create persons
-	"""
-	def __init__(self, size, position_initial, color):
-		self.x, self.y = position_initial
-		self.size = size
-		self.color = color
-		self.rot = {"right":0,"left":0,"down":0,"up":0 } 
-		self.image = images["pharight"]
-	def draw(self, screen):
-		screen.blit(self.image, (self.x, self.y))
-		#baku = pygame.Rect(self.x, self.y, 25, 25)
-		#pygame.draw.rect(screen, self.color, baku, 0)
-	def move_right(self):
-		if self.rot["right"]:
-			self.x+=1
-		else:
-			self.rot["right"] = 50
-		self.image = images["pharight"]
-	def move_left(self):
-		if self.rot["left"]:
-			self.x-=1
-		else:
-			self.rot["left"] = 50
-		self.image = images["phaleft"]
-	def move_up(self):
-		if self.rot["up"]:
-			self.y-=1
-		else:
-			self.rot["up"] = 50
-		self.image = images["phaup"]
-	def move_down(self):
-		if self.rot["down"]:
-			self.y+=1
-		else:
-			self.rot["down"] = 50
-		self.image = images["phadown"]
 	
 """ END of Classes """
 
-
-tab = Board(49, 20, 10, 2)
-players = []
-player_one = Person(32, (6+5,11+5), (150,40,0))
+BRANCO = (255, 255, 255)
+reta = Reta((25, 25), 200, BRANCO)
 
 txt = Form((5,500),830,fontsize=13,height=86,bg=(230,230,230),fgcolor=(100,50,100),hlcolor=(250,190,150,100),curscolor=(190,0,10))
 txt.OUTPUT = unicode("""player_one.move_right()""","utf8")
 #txt.show()
-player_id = 0
-turn = 1 # start from 1
-flow = [{"t":0,"j":1,"c":"player_one.move_right()","s":0}] # The atributes are, respectivily, turn, player, command and status (executed or not). 
 run = 0
+velocidade = 1
 while True:
 	#os.system("clear")	
 	"""
 	Main loop :) 
 	"""
+
+        velocidade += 0.1
+	
+	for i in range(int(velocidade)): reta.move_right() 
 	# Background #
 	pygame.display.flip()	
 	screen.fill(back)	
@@ -476,28 +414,14 @@ while True:
 	#xlocal,ylocal = ymouse/50, xmouse/50
 	
 	#if pygame.key.get_pressed()[pygame.K_SPACE]:
-	tab.draw(screen, (player_one.y+int(player_one.size/2.))/50, (player_one.x+int(player_one.size/2.))/50)
-	player_one.draw(screen)
+	reta.draw(screen)
 	
 	
 	
 	#for line in tab.matrix:
 		#print line	
 	
-	tab.matrix[(player_one.y+int(player_one.size/2.))/50][ (player_one.x+int(player_one.size/2.))/50] = "X"
 	
-	if player_one.rot["right"]:
-		player_one.move_right()
-		player_one.rot["right"]-=1
-	if player_one.rot["left"]:
-		player_one.move_left()
-		player_one.rot["left"]-=1
-	if player_one.rot["down"]:
-		player_one.move_down()
-		player_one.rot["down"]-=1
-	if player_one.rot["up"]:
-		player_one.move_up()
-		player_one.rot["up"]-=1
 	
 	
 	# (56,16,230) cor legal pra o outro person
@@ -527,30 +451,8 @@ while True:
 		#except: txt.OUTPUT = "This can't be executed, seu jumento!"
 		 sleep(1)
 	
-	for command in flow:
-		if command["t"]==turn and command["s"]==0 and not run:
-			try:
-				exec(command["c"])
-			except:txt.OUTPUT = "This line has an error and couldn't be executed.\n>>> "+command["c"]
-			command["s"]=1
-			run = 50	
-			break
 	
 	if run:
 		run-=1
 		
-	#TODO make the exec works with multiline instructions, like for's, while's ...	
-	#TODO put a second player	
-		
-		
-		
-		
-		
-	# Bliting text >>>
-	#text = font_big.render(u'Example!'.decode("utf8"), True,(255,255, 255))
-	#screen.blit(text, POSITION)
-	# Bliting Images >>>
-	#screen.blit(images["nameofimage"], POSITION)
 	
-	# Get mouse position		
-	#mouse = pygame.mouse.get_pos()
