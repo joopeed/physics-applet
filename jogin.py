@@ -100,9 +100,10 @@ class RetaDeExibicao(Reta):
 
     def draw(self, screen):
                 pygame.draw.line(screen, self.color, (self.x, self.y), (self.x + self.length, self.y), 2)
-                quantidade_de_tracos = 4
-                tamanho_gap = self.length/quantidade_de_tracos
-                for i in range(self.x, self.x + self.length + tamanho_gap, tamanho_gap):
+                quantidade_de_tracos = 8
+                tamanho_gap = self.length/(quantidade_de_tracos - 1)
+                adicional = 0 if (quantidade_de_tracos - 1) % 2 != 0 else tamanho_gap
+                for i in range(self.x, self.x + self.length + adicional, tamanho_gap):
                     pygame.draw.line(screen, self.color, (i, self.y), POSICAO_OLHO, 1)
 
 
@@ -148,17 +149,8 @@ while True:
         if reta_principal.x > 500:
             reta_principal.exibe_reta_vermelha(retas)
 	
-	#for line in tab.matrix:
-		#print line	
 	
-	
-	
-	
-	# (56,16,230) cor legal pra o outro person
-		
-	mouse = pygame.mouse.get_pos()
-	
-	text = font_big.render(u'Execute!'.decode("utf8"), True,(255,255, 255))
+	text = font_big.render(u'Iniciar'.decode("utf8"), True,(255,255, 255))
 	
 	botao = pygame.Rect(850, 520, 120, 50)
 	pygame.draw.rect(screen, (56,16,30), botao, 0)
