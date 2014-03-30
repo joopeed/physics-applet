@@ -3,8 +3,10 @@
 
 Development by
 João Pedro Ferreira de Melo Leôncio
-Gustavo Henrique Queiroz
-Franco Stefano Baroni
+Leticia Farias Wanderley
+Maysa Macedo
+Fellype Cavalcante
+Ana Luiza Motta Gomes
 
 """
 
@@ -87,11 +89,11 @@ class Reta:
                 
         def exibe_reta_azul(self, retas):
             if not self.azul:
-                retas.append(RetaDeExibicao((self.x, self.y - 5), self.length, AZUL))
+                retas.append(RetaDeExibicao((self.x, self.y), self.length, AZUL))
                 self.azul = True
         def exibe_reta_vermelha(self, retas):
             if not self.vermelha:
-                retas.append(RetaDeExibicao((self.x, self.y - 5), self.length, VERMELHO))
+                retas.append(RetaDeExibicao((self.x, self.y), self.length, VERMELHO))
                 self.vermelha = True
 
 class RetaDeExibicao(Reta):
@@ -107,6 +109,62 @@ class RetaDeExibicao(Reta):
                     pygame.draw.line(screen, self.color, (i, self.y), POSICAO_OLHO, 1)
 
 
+class Botao:
+    def __init__(self, nome, position):
+        self.nome = nome
+        self.x, self.y = position
+        self.botao = pygame.Rect(self.x, self.y, 120, 50)
+        self.apertado = False
+
+    def draw(self, screen):
+        text = font_big.render(self.nome.decode("utf8"), True,(255,255, 255))
+	pygame.draw.rect(screen, (56,16,30), self.botao, 0)
+	screen.blit(text, (self.x + 20, self.y + 10))
+
+    def apertou(self):
+        if not self.apertado:
+            self.apertado = self.botao.collidepoint(pygame.mouse.get_pos()) and pygame.mouse.get_pressed()[0]
+        return self.apertado
+
+
+class Regulador:
+    def __init__(self, position, inicio, fim, inicial):
+        self.x, self.y = position
+        self.inicio = inicio
+        self.fim = fim
+        self.valor_atual = inicial
+        self.mexendo = False
+
+
+    def draw(self, screen):
+        sub_parte = 4
+        inicio = int(self.inicio*100)
+        fim = int(self.fim*100)
+        atual = int(self.valor_atual*100)
+        porcentagem = (100.0 / (fim-inicio)) * (atual - inicio)
+        barra = Rect(self.x, self.y, 400, 20)
+        pygame.draw.rect(screen, BRANCO, barra)
+        local = Rect(self.x + porcentagem * sub_parte , self.y - 10, 10, 40)
+        pygame.draw.rect(screen, AZUL, local)
+        
+    def apertou(self):
+        sub_parte = 4
+        inicio = int(self.inicio*100)
+        fim = int(self.fim*100)
+        atual = int(self.valor_atual*100)
+        porcentagem = (100.0 / (fim-inicio)) * (atual - inicio)
+        local = Rect(self.x + porcentagem * sub_parte , self.y - 10, 10, 40)
+        if pygame.mouse.get_pressed()[0] and local.collidepoint(pygame.mouse.get_pos()):
+            self.mexendo = True
+        if self.mexendo:
+            if not pygame.mouse.get_pressed()[0]: self.mexendo = False
+            porcentagem_atual = (pygame.mouse.get_pos()[0] - self.x) / sub_parte
+            print self.valor_atual
+            if self.inicio < self.inicio + (self.fim - self.inicio) * porcentagem_atual/100. < self.fim:
+                self.valor_atual = self.inicio + (self.fim - self.inicio) * porcentagem_atual/100. 
+        
+
+    
 
 	
 """ END of Classes """
@@ -115,7 +173,8 @@ reta_principal = Reta((25, 25), 80, BRANCO)
 retas = [reta_principal]
 run = 0
 velocidade = 1
-
+botao = Botao("Inicia", (800, 500))
+regulador = Regulador((200, 500), 0.5, 0.9, 0.5)
 while True:
 	#os.system("clear")	
 	"""
@@ -124,7 +183,7 @@ while True:
 
         velocidade += 0.1
 	
-	reta_principal.move_right()
+	
 	
 	# Background #
 	pygame.display.flip()	
@@ -139,26 +198,19 @@ while True:
 	if pygame.key.get_pressed()[pygame.K_ESCAPE]:
 		sys.exit()                                   
 	
-	
-	#if pygame.key.get_pressed()[pygame.K_SPACE]:
-	for reta in retas:
-            reta.draw(screen)
+	if botao.apertou():
+            reta_principal.move_right()
+            for reta in retas:
+                reta.draw(screen)
 
         if reta_principal.x > 300:
             reta_principal.exibe_reta_azul(retas)
         if reta_principal.x > 500:
             reta_principal.exibe_reta_vermelha(retas)
 	
-	
-	text = font_big.render(u'Iniciar'.decode("utf8"), True,(255,255, 255))
-	
-	botao = pygame.Rect(850, 520, 120, 50)
-	pygame.draw.rect(screen, (56,16,30), botao, 0)
-	screen.blit(text, (860,530))
+	botao.draw(screen)
+	regulador.draw(screen)
+	regulador.apertou()
 	
 	
-	
-	if run:
-		run-=1
-		
 	
