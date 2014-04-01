@@ -57,7 +57,7 @@ images["eye"] = pygame.image.load("eye.png").convert_alpha()
 BRANCO = (255, 255, 255)
 AZUL = (32, 0, 138)
 VERMELHO = (138, 0, 0)
-POSICAO_OLHO = (411, 433)
+POSICAO_OLHO = (409, 434)
 
 """ Functions here"""
 
