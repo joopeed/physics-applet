@@ -82,12 +82,17 @@ class Reta:
                 self.azul = False
                 self.vermelha = False
 		self.velocidade = 0.5
+		self.length_relative = length
 
         def draw(self, screen):
-                pygame.draw.line(screen, self.color, (self.x, self.y), (self.x + self.length, self.y), 3)
+                pygame.draw.line(screen, self.color, (self.x, self.y), (self.x + self.length_relative, self.y), 3)
+	
+	def atualiza_velocidade(self, valor):
+                self.velocidade = valor
 
-        def move_right(self):
+        def move_right(self, velocidade):
                 self.x += 1 * int(math.ceil(self.velocidade))
+	        self.length_relative = self.length * math.sqrt( 1 - (velocidade)**2 )
         def move_left(self):
                 self.x -= 1 * int(math.ceil(self.velocidade))
                 
@@ -98,7 +103,7 @@ class Reta:
                 self.azul = True
         def exibe_reta_vermelha(self, retas, velocidade_atual):
             if not self.vermelha:
-                tamanho_relativo = self.length * math.sqrt( 1 - velocidade_atual**2 )
+                tamanho_relativo = self.length_relative
                 retas.append(RetaDeExibicao((self.x, self.y), tamanho_relativo, VERMELHO))
                 self.vermelha = True
 
@@ -111,7 +116,7 @@ class RetaDeExibicao(Reta):
                 quantidade_de_tracos = 4
                 tamanho_gap = int(self.length)/(quantidade_de_tracos - 1)
                 adicional = 0 if (quantidade_de_tracos - 1) % 2 != 0 else tamanho_gap
-                for i in range(self.x, int(math.ceil(self.x + self.length + adicional)), tamanho_gap):
+                for i in range(self.x, int(math.ceil(self.x + self.length + adicional +1)), tamanho_gap):
                     pygame.draw.line(screen, self.color, (i, self.y), POSICAO_OLHO, 1)
 
 
@@ -179,12 +184,12 @@ class Regulador:
 
 	
 """ END of Classes """
-tamanho_reta = 80
+tamanho_reta = 150
 reta_principal = Reta((-100, 25), tamanho_reta, PRETO)
 retas = [reta_principal]
 def reset():
 	global reta_principal
-	reta_principal = Reta((-100, 25), 80, BRANCO)
+	reta_principal = Reta((-100, 25), tamanho_reta, PRETO)
 	global retas
 	retas = [reta_principal]
 botao = Botao("Iniciar", (480, 515))
@@ -202,7 +207,6 @@ while True:
 	if reta_principal.x > 400:
 		reta_principal.velocidade = 1 + regulador.valor_atual
 
-	
 	
 	# Background #
 	pygame.display.flip()	
@@ -223,7 +227,7 @@ while True:
 	if botao.apertou():
 		reset()
 		botao.desapertou()
-        reta_principal.move_right()
+        reta_principal.move_right(regulador.valor_atual)
         for reta in retas:
             reta.draw(screen)
 
