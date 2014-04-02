@@ -15,7 +15,7 @@ from time import *
 pygame.init()
  
 size = wid, hei = 990, 590 # size obviously ## pensei em aumentar o tamanho!!
-back = 132, 122, 130 # background color RGB
+back = 255, 255, 255 # background color RGB
 screen = pygame.display 
 screen.set_caption("Applet de Fisica")
 screen = pygame.display.set_mode(size)
@@ -44,6 +44,7 @@ font_small = pygame.font.Font(None, 15)
 # Buffer image
 images = {}
 images["eye"] = pygame.image.load("eye.png").convert_alpha()
+images["shadow"] = pygame.image.load("shadow.png").convert_alpha()
 #images["pharight"] = pygame.image.load("monstrinhoright.png").convert_alpha()
 #images["phaleft"] = pygame.image.load("monstrinholeft.png").convert_alpha()
 #images["phadown"] = pygame.image.load("monstrinhodown.png").convert_alpha()
@@ -53,11 +54,12 @@ images["eye"] = pygame.image.load("eye.png").convert_alpha()
 
 # Set the mouse visibility
 #pygame.mouse.set_visible(False)
-
+PRETO = (0, 0, 0)
 BRANCO = (255, 255, 255)
 AZUL = (32, 0, 138)
 VERMELHO = (138, 0, 0)
 POSICAO_OLHO = (411, 433)
+CINZA = (132, 122, 130)
 
 """ Functions here"""
 
@@ -91,11 +93,13 @@ class Reta:
                 
         def exibe_reta_azul(self, retas):
             if not self.azul:
-                retas.append(RetaDeExibicao((self.x, self.y), self.length, AZUL))
+                tamanho_real = self.length
+                retas.append(RetaDeExibicao((self.x, self.y), tamanho_real, AZUL))
                 self.azul = True
-        def exibe_reta_vermelha(self, retas):
+        def exibe_reta_vermelha(self, retas, velocidade_atual):
             if not self.vermelha:
-                retas.append(RetaDeExibicao((self.x, self.y), self.length, VERMELHO))
+                tamanho_relativo = self.length * math.sqrt( 1 - velocidade_atual**2 )
+                retas.append(RetaDeExibicao((self.x, self.y), tamanho_relativo, VERMELHO))
                 self.vermelha = True
 
 class RetaDeExibicao(Reta):
@@ -105,9 +109,9 @@ class RetaDeExibicao(Reta):
     def draw(self, screen):
                 pygame.draw.line(screen, self.color, (self.x, self.y), (self.x + self.length, self.y), 2)
                 quantidade_de_tracos = 4
-                tamanho_gap = self.length/(quantidade_de_tracos - 1)
+                tamanho_gap = int(self.length)/(quantidade_de_tracos - 1)
                 adicional = 0 if (quantidade_de_tracos - 1) % 2 != 0 else tamanho_gap
-                for i in range(self.x, self.x + self.length + adicional, tamanho_gap):
+                for i in range(self.x, int(math.ceil(self.x + self.length + adicional)), tamanho_gap):
                     pygame.draw.line(screen, self.color, (i, self.y), POSICAO_OLHO, 1)
 
 
@@ -175,15 +179,19 @@ class Regulador:
 
 	
 """ END of Classes """
-reta_principal = Reta((-100, 25), 80, BRANCO)
+tamanho_reta = 80
+reta_principal = Reta((-100, 25), tamanho_reta, PRETO)
 retas = [reta_principal]
 def reset():
 	global reta_principal
 	reta_principal = Reta((-100, 25), 80, BRANCO)
 	global retas
 	retas = [reta_principal]
-botao = Botao("Iniciar", (600, 515))
-regulador = Regulador((100, 530), 0.1, 0.9, 0.5)
+botao = Botao("Iniciar", (480, 515))
+regulador = Regulador((20, 530), 0.1, 0.9, 0.5)
+barra_baixo = Rect(0, 485, 990, 115)
+
+
 while True:
 	#os.system("clear")	
 	"""
@@ -199,7 +207,10 @@ while True:
 	# Background #
 	pygame.display.flip()	
 	screen.fill(back)
-	screen.blit(images["eye"], (380, 400)) 
+	screen.blit(images["eye"], (380, 400))
+	screen.blit(images["shadow"], (-100, 420))
+	
+        pygame.draw.rect(screen, CINZA, barra_baixo)
 	#EXIT MODES
 	if pygame.event.peek(pygame.QUIT): break
 	for event in pygame.event.get():
@@ -220,7 +231,7 @@ while True:
         if reta_principal.x > 100:
             reta_principal.exibe_reta_azul(retas)
         if reta_principal.x > 700:
-            reta_principal.exibe_reta_vermelha(retas)
+            reta_principal.exibe_reta_vermelha(retas, regulador.valor_atual)
 	
 	botao.draw(screen)
 	regulador.draw(screen)
