@@ -167,7 +167,7 @@ class Regulador:
             if not pygame.mouse.get_pressed()[0]: self.mexendo = False
             porcentagem_atual = (pygame.mouse.get_pos()[0] - self.x) / sub_parte
             print self.valor_atual
-            if self.inicio < self.inicio + (self.fim - self.inicio) * porcentagem_atual/100. < self.fim:
+            if self.inicio <= self.inicio + (self.fim - self.inicio) * porcentagem_atual/100. <= self.fim:
                 self.valor_atual = self.inicio + (self.fim - self.inicio) * porcentagem_atual/100. 
         
 
