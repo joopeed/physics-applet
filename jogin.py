@@ -31,6 +31,7 @@ from pygame.locals import *
 # Fonts
 pygame.font.init()
 calibri = pygame.font.SysFont("calibri", 32)
+calibri_small = pygame.font.SysFont("calibri", 18)
 font_big = pygame.font.Font(None, 35)
 font_medium = pygame.font.Font(None, 22)
 font_small = pygame.font.Font(None, 15)
@@ -38,7 +39,10 @@ font_small = pygame.font.Font(None, 15)
 
 # Buffer image
 images = {}
+images["box_shadow"] = pygame.image.load("sombra_detalhes.png").convert_alpha()
 images["eye"] = pygame.image.load("eye.png").convert_alpha()
+images["blur"] = pygame.image.load("blur.png").convert_alpha()
+images["sobre"] = pygame.image.load("sobre.png").convert_alpha()
 images["shadow"] = pygame.image.load("shadow.png").convert_alpha()
 # End of buffer image
 
@@ -183,28 +187,43 @@ def reset():
 	reta_principal = Reta((-100, 25), tamanho_reta, PRETO)
 	global retas
 	retas = [reta_principal]
+def abre_sobre():
+        #while True:
+                screen.blit(images["blur"], (0, 0))
+                screen.blit(images["sobre"], (0, -80))
+                #pygame.event.wait()
+			             
+
 botao = Botao("Iniciar", (480, 515))
-regulador = Regulador((20, 530), 0.1, 0.9, 0.5)
+sobre = Botao("Sobre", (630, 515))
+regulador = Regulador((20, 530), 0.5, 0.9, 0.5)
 barra_baixo = Rect(0, 485, 990, 115)
 velocidade_escolhida = 0.5
+exibe = True
 
 while True:
 	#os.system("clear")	
 	"""
 	Main loop :) 
 	"""
-
-	
-	
-
-	
+	if exibe:
+                calibri_small.set_bold(True)
+                text = calibri_small.render(("Experimento de Contração de Comprimento").decode("utf8"), True,PRETO)
+                screen.blit(text, (600, 440))
+                calibri_small.set_bold(False)
+                text = calibri_small.render(("Comprimento Inicial: %.1f m" % reta_principal.length).decode("utf8"), True,(255,255, 255))
+                screen.blit(text, (10, 400))
+                text = calibri_small.render(("Comprimento Atual: %.1f m" % reta_principal.length_relative).decode("utf8"), True,(255,255, 255))
+                screen.blit(text, (10, 420))
+                text = calibri_small.render(("Velocidade atingida: %.2fc" % velocidade_escolhida).decode("utf8"), True,(255,255, 255))
+                screen.blit(text, (10, 440))
 	# Background #
 	pygame.display.flip()	
 	screen.fill(back)
 	screen.blit(images["eye"], (380, 400))
-	screen.blit(images["shadow"], (-100, 420))
 	
-        pygame.draw.rect(screen, CINZA, barra_baixo)
+        #pygame.draw.rect(screen, CINZA, barra_baixo)
+        screen.blit(images["box_shadow"], (-50, 350))
 	#EXIT MODES
 	if pygame.event.peek(pygame.QUIT): break
 	for event in pygame.event.get():
@@ -214,10 +233,12 @@ while True:
 	if pygame.key.get_pressed()[pygame.K_ESCAPE]:
 		sys.exit()                                   
 	
-	if botao.apertou():
+	if botao.apertou() and not regulador.mexendo:
 		reset()
 		velocidade_escolhida = regulador.valor_atual
 		botao.desapertou()
+	
+                
         reta_principal.velocidade = 1 + velocidade_escolhida
         reta_principal.move_right(velocidade_escolhida)
         for reta in retas:
@@ -230,8 +251,12 @@ while True:
             reta_principal.exibe_reta_vermelha(retas, velocidade_escolhida)
 	
 	botao.draw(screen)
+	sobre.draw(screen)
 	regulador.draw(screen)
 	regulador.apertou()
+	if sobre.apertou() and not regulador.mexendo:
+                abre_sobre()
+                exibe = False
 	
 	
 	
