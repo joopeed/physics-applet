@@ -1,0 +1,8 @@
+Execute o arquivo applet.exe
+
+É necessária a presença dos seguintes arquivos para a execução correta:
+blur.png
+eye.png
+shadow.png
+sobre.png
+sombra_detalhes.png

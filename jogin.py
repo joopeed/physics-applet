@@ -32,9 +32,9 @@ from pygame.locals import *
 pygame.font.init()
 calibri = pygame.font.SysFont("calibri", 32)
 calibri_small = pygame.font.SysFont("calibri", 18)
-font_big = pygame.font.Font(None, 35)
-font_medium = pygame.font.Font(None, 22)
-font_small = pygame.font.Font(None, 15)
+#font_big = pygame.font.Font(None, 35)
+font_medium = pygame.font.SysFont("calibri", 18)
+#font_small = pygame.font.Font(None, 15)
 # End Fonts
 
 # Buffer image
